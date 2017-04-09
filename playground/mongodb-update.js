@@ -2,7 +2,7 @@
 const {MongoClient, ObjectID} = require('mongodb'); //creates variable equal to property with same name of require mongodb , comma allows multiple
 
 
-MongoClient.connect('mongodb://localhost:27017/TodoApp',(err, db)=>{
+MongoClient.connect('mongodb://localhost:27017/TodoAppTests',(err, db)=>{
     if(err){
        return console.log('Unable to connect to mongo db server');//preventing the rest of function from executing with return
     }
