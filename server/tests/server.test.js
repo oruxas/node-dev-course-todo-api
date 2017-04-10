@@ -1,9 +1,11 @@
 const expect = require('expect');
 const request = require('supertest');
 
-var {app} = require('./../server') ;
-var {Todo} = require('./../models/todo');
-var {User} = require('./../models/user');
+const {ObjectId} = require('mongodb');
+
+const {app} = require('./../server') ;
+const {Todo} = require('./../models/todo');
+const {User} = require('./../models/user');
 
 //testing lifecycle method;
 //lets run some code before any tests
@@ -17,8 +19,10 @@ var {User} = require('./../models/user');
 
 //Creating dummy todos
 const todos = [{
+    _id: new ObjectId(),
     text: "First test todo"
 }, {
+     _id: new ObjectId(),
     text: "Second test todo"
 }];
 
@@ -87,3 +91,30 @@ describe('GET /todos',()=>{
       }); //end get all todos test
 
 });//end describe GET
+
+describe('GET /todos/:id', ()=>{
+    it('should return todo doc', (done)=>{
+        request(app)
+            .get(`/todos/${todos[0]._id.toHexString()}`)
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.text).toBe(todos[0].text);
+            })
+            .end(done);
+    });
+
+    it('shoud return 404 if todo not found', (done)=>{
+        option2: var hexId = new ObjectId().toHexString(); 
+        request(app)
+            .get(`/todos/${hexId}`) //need to pass completely new id not from existing todos array
+            .expect(404)
+            .end(done);
+    });
+
+    it('should return 404 for none-object ids',(done)=>{
+        request(app)
+            .get(`/todos/${123}`)
+                .expect(404)
+                .end(done);
+    });
+});
