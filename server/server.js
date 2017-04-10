@@ -57,6 +57,24 @@ app.get('/todos/:id',(req,res)=>{
    });
 });
 
+app.delete('/todos/:id', (req, res)=>{
+    var id = req.params.id;
+
+    if(!ObjectId.isValid(id)){
+        return res.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id).then((todo)=>{
+        if(!todo){
+            return res.status(404).send();
+        }
+        res.status(200).send({todo});
+    }).catch((err)=>{
+        res.status(400).send();
+    });
+});
+
+
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);
 })
@@ -95,3 +113,5 @@ module.exports = {
 //NOTES
 //behind scenes waits for connection before ever trying to make query
 //body parser lets send json to server
+
+//delete by id success gets called even if no docs are deleted
