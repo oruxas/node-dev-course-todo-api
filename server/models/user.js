@@ -44,6 +44,7 @@ UserSchema.methods.toJSON = function(){
 //instance methods have acces to individual docs
 //arrow funcs do not bind this keyword, but here this stores individual doc
 UserSchema.methods.generateAuthToken = function(){
+    //instance methods gets called with individual docs
     var user = this;
 
     var access = 'auth';
@@ -54,6 +55,29 @@ UserSchema.methods.generateAuthToken = function(){
         return token;
     })
 };
+
+//everything we add to sttics turns to model methods where as methods to instances
+UserSchema.statics.findByToken = function (token){
+    
+    var User = this;
+    var decoded;
+
+    try{
+      decoded =  jwt.verify(token, 'abc123');
+      //console.log(decoded);
+    } catch (err){
+        return Promise.reject();
+    }
+    
+    //success
+    return User.findOne({
+        //quates here just for consistency
+        _id: decoded._id, 
+        //to query nested values wrap in quates
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+}
 
 var User = mongoose.model('User', UserSchema);
 
