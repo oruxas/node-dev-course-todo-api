@@ -1,15 +1,31 @@
 //json web token gives two funcs, one to create token and one to verify it
 const jwt = require('jsonwebToken');
+const bcrypt = require('bcryptjs');
 
-var data = {
-    id: 10
-}
+var password = '123abc';
 
-var token = jwt.sign(data, '123abc');    //takes object with data and signs it: creates hash, returns token val
-//token is velue we send back to user when log in, stored in tokens array
-console.log(token);
-var decoded = jwt.verify(token, '123abc'); //takes token and secret and makes surevasnt validated.
-console.log('decoded', decoded);
+// bcrypt.genSalt(10, (err, salt)=>{
+//     bcrypt.hash(password, salt, (err, hash)=>{
+//         console.log(hash);
+//     });
+// }); //first arg number of rounds you wanna use to generate salt
+
+var hashedPassword = '$2a$10$cNjqazPOWF7EL4nN/Z.DAeLpFJC2thXwnrRuIJJ9dsDdW/LVfWng2';
+
+bcrypt.compare(password, hashedPassword, (err, res)=>{
+    console.log(res);
+});
+
+
+// var data = {
+//     id: 10
+// }
+
+// var token = jwt.sign(data, '123abc');    //takes object with data and signs it: creates hash, returns token val
+// //token is velue we send back to user when log in, stored in tokens array
+// console.log(token);
+// var decoded = jwt.verify(token, '123abc'); //takes token and secret and makes surevasnt validated.
+// console.log('decoded', decoded);
 
 //NOTES 
 //token random string consists of 3 parts: header, payload (we added), verify signature
