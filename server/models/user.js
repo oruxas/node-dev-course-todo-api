@@ -82,12 +82,12 @@ UserSchema.statics.findByToken = function (token){
 
 UserSchema.pre('save', function (next){
     var user = this;
-    console.log('something');
+    //console.log('something');
     //true if pasword modified
    if( user.isModified('password')) {
-       console.log('inside');
+       //console.log('inside');
         bcrypt.genSalt(10, (err, salt)=>{
-            console.log('me');
+            //console.log('me');
             bcrypt.hash(user.password, salt, (err, hash)=>{
                 user.password = hash;
                 next(); //completes middleware
