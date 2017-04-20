@@ -103,7 +103,6 @@ app.patch('/todos/:id',(req, res)=>{
     });
 });
 
-
 app.post('/users', (req, res)=>{
     var body = _.pick(req.body, ['email', 'password']);
     var user = new User(body);
@@ -123,6 +122,26 @@ app.post('/users', (req, res)=>{
 app.get('/users/me', authenticate, (req, res)=>{
    res.send(req.user);
 });
+
+//route for logging users
+//POST /users/login {email, password}
+app.post('/users/login', (req, res)=>{
+     var body = _.pick(req.body, ['email', 'password']);
+
+     User.findByCredentials(body.email, body.password).then((user)=>{
+         //no need to check if user exist cuz already done in findByCredentials if true, catch would run
+        //res.send(user);
+        return user.generateAuthToken().then((token)=>{
+            //return to keep chain alive, cuz if errors here, catch will catch em
+            res.header('x-auth', token).send(user);
+        });
+     }).catch((err)=>{
+         res.status(400).send();
+     });
+
+     //res.send(body);
+});
+
 
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);

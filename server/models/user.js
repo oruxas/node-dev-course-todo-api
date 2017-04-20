@@ -80,6 +80,30 @@ UserSchema.statics.findByToken = function (token){
     });
 };//end find by token
 
+UserSchema.statics.findByCredentials = function(email, password){
+    //var user = this;
+   var User = this;
+
+   //return for chaining
+   return User.findOne({email}).then((user)=>{
+       if(!user){
+           //rejected promise automatically calls catch in server.js
+        return Promise.reject();
+       }
+
+       //bcrypt methods does not support promises, but callbacks only
+       return new Promise((resolve, reject)=>{
+            bcrypt.compare(password, user.password, (err, res)=>{
+                if (res){
+                    resolve(user);
+                } else{
+                    reject();
+                }
+            })
+       });
+   });
+};
+
 UserSchema.pre('save', function (next){
     var user = this;
     //console.log('something');
