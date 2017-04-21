@@ -57,6 +57,19 @@ UserSchema.methods.generateAuthToken = function(){
     })
 };
 
+UserSchema.methods.removeToken = function(token){
+    //$pull let remove tems from array that match certain criteria
+    var user = this;
+    return user.update({
+        $pull:{
+            //pull from tokens array token that match  token from parameter, if match removes entire object
+            tokens: {
+                token: token
+            }
+        }
+    });
+};
+
 //everything we add to sttics turns to model methods where as methods to instances
 UserSchema.statics.findByToken = function (token){
     

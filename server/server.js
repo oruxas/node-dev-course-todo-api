@@ -142,6 +142,14 @@ app.post('/users/login', (req, res)=>{
      //res.send(body);
 });
 
+app.delete('/users/me/token',authenticate, (req, res)=>{
+    //calling instance method to delete token
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+    }, ()=>{
+        res.status(400).send();
+    }); 
+});
 
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);
