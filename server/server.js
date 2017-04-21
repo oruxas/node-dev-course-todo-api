@@ -16,11 +16,12 @@ const port = process.env.PORT;// || 3000 set with environment;
 
 app.use(bodyParser.json());
 
-app.post('/todos',(req, res)=>{
+app.post('/todos',authenticate,(req, res)=>{
     console.log(req.body); //body gets stored by body parser
 
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
 
     todo.save().then((doc)=>{
@@ -31,8 +32,10 @@ app.post('/todos',(req, res)=>{
 
 });
 
-app.get('/todos', (req, res)=>{
-    Todo.find().then((todos)=>{
+app.get('/todos', authenticate, (req, res)=>{
+    Todo.find({
+        _creator: req.user._id  //id of user being authenticated on authenticate.js
+    }).then((todos)=>{
         res.send({todos});
     }, (err)=>{
         res.status(400).send(err);
@@ -41,7 +44,7 @@ app.get('/todos', (req, res)=>{
 
 //var id = '58ea38c5effa77144080d715';
 
-app.get('/todos/:id',(req,res)=>{
+app.get('/todos/:id', authenticate,(req,res)=>{
    // req.params.id    
    var id = req.params.id;
 
@@ -50,7 +53,10 @@ app.get('/todos/:id',(req,res)=>{
     return res.status(404).send();
    }
 
-   Todo.findById(id).then((todo)=>{
+   Todo.findOne({
+       _id: id,
+       _creator: req.user._id
+   }).then((todo)=>{  //previuosly find by id, no longer valid
     if(!todo){
         return res.status(404).send();
     }
@@ -61,14 +67,17 @@ app.get('/todos/:id',(req,res)=>{
    });
 });
 
-app.delete('/todos/:id', (req, res)=>{
+app.delete('/todos/:id', authenticate, (req, res)=>{
     var id = req.params.id;
 
     if(!ObjectId.isValid(id)){
         return res.status(404).send();
     }
 
-    Todo.findByIdAndRemove(id).then((todo)=>{
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: req.user._id
+    }).then((todo)=>{ //previously findByIdAndRemove
         if(!todo){
             return res.status(404).send();
         }
@@ -78,7 +87,7 @@ app.delete('/todos/:id', (req, res)=>{
     });
 });
 
-app.patch('/todos/:id',(req, res)=>{
+app.patch('/todos/:id', authenticate,(req, res)=>{
     var id = req.params.id;
     //so  that user wouldn't be able to update whatever 
     var body = _.pick(req.body, ['text', 'completed']);   //pass req.body and takes array of properties if exist
@@ -92,7 +101,10 @@ app.patch('/todos/:id',(req, res)=>{
         body.completedAt = null;
     }
 
-    Todo.findByIdAndUpdate(id, { $set: body}, {new: true}).then((todo)=>{
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: req.user._id
+    }, { $set: body}, {new: true}).then((todo)=>{ //previously findByIdAndUpdate no longer valid
         if(!todo){
             return res.status(404).send();
         }
