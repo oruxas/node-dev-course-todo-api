@@ -1,6 +1,8 @@
 var env = process.env.NODE_ENV || 'development';
 // console.log('env ***** ', env);
 
+
+//only test and development environments configured locally, production is configured on heroku or elswwhere
 if(env ==="development" || env === "test"){
     //when requiring json file t automatically parses it to a javascript object
     var config = require('./config.json');
@@ -12,6 +14,7 @@ if(env ==="development" || env === "test"){
     process.env[key] = envConfig[key];
    });
 }
+
 
 // if (env === 'development'){
 //     process.env.port = 3000;
